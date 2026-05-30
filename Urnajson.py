@@ -9,24 +9,23 @@ if os.path.exists("votos.json"):
         candidatos = {int(chave): valor for chave, valor in dados_salvos["candidatos"].items()}
         nulos = dados_salvos["nulos"]
         brancos = dados_salvos["brancos"]
+        senha_colaborador = dados_salvos["senha_colaborador"]
         print("[SISTEMA] Dados de votação anteriores carregados com sucesso!")
 else:
     # Declaração da lista e das variaveis
     candidatos = {}
     nulos = 0
     brancos = 0
+    senha_colaborador = None
 
     print("Iniciando o Sistema...")
-
-
-#configuração de senha
-senha_admin = "1234"
 
 def salvar_dados():
     dados_para_salvar = {
         "candidatos": candidatos,
         "nulos": nulos,
-        "brancos": brancos
+        "brancos": brancos,
+        "senha_colaborador": senha_colaborador
     }
     with open("votos.json", "w") as arquivo:
         json.dump(dados_para_salvar, arquivo, indent=4)
@@ -39,15 +38,62 @@ while True:
 
     # Menu do Colaborador
     if info == "COLABORADOR":
+        if senha_colaborador is None:
+            print("Primeiro Acesso: CADASTRO DE COLABORADOR")
+            print("Para sua segurança, crie uma senha de 4 digitos que misture letras e números.")
+
+            while True:
+                nova_senha = input("Digite sua senha (4 caracteres): ").strip()
+                if len(nova_senha) == 4 and not nova_senha.isdigit() and not nova_senha.isalpha():
+                    senha_colaborador = nova_senha
+                    salvar_dados()
+                    print("\n[SENHA SALVA COM SUCESSO] Use-a para fazer login agora")
+                    break
+                else:
+                    print("\n[ERRO] Senha inválida! Sua senha tem que ter: ")
+                    print("\n- Exatamente 4 caracteres")
+                    print("\n- Conter pelo menos uma letra e um número (ex: a1b2, 3X4y).")
+                    print("-----------------------------------------")
+            continue
+
         autenticado = False
         tentativas = 3
 
         print("-----------------------------------------")
         print("Autenticação")
         while tentativas > 0:
-            senha = input("Digite a senha: ")
+            senha = input("Digite a senha (Digite ESQUECI para redefinir): ").strip()
 
-            if senha == senha_admin:
+            if senha.upper() == "ESQUECI":
+                token_rec = random.randint(1000,9999)
+                print(f"\nToken de recuperação enviado para o seu dispositivo: {token_rec}")
+
+                try:
+                    confirma_token = int(input("Digite o Token de Recuperação: "))
+                except ValueError:
+                    print("Entrada inválida! Operação cancelada!")
+                    break
+                if confirma_token == token_rec:
+                    print("REDEFIR SENHA")
+                    while True:
+                        nova_senha = input("Digite a nova senha (4 caracteres com letras e números): ")
+                        if len(nova_senha) == 4 and not nova_senha.isdigit() and not nova_senha.isalpha():
+                            senha_colaborador = nova_senha
+                            salvar_dados()
+                            print("\n[SENHA SALVA COM SUCESSO] Use-a para fazer login agora")
+                            break
+                        else:
+                            print("\n[ERRO] Senha inválida! Sua senha tem que ter: ")
+                            print("\n- Exatamente 4 caracteres")
+                            print("\n- Conter pelo menos uma letra e um número (ex: a1b2, 3X4y).")
+                            print("-----------------------------------------")
+                    autenticado = True
+                    break
+                else:
+                    print("[ERRO] Código incorreto Operação cancelada!")
+                    break
+
+            elif senha == senha_colaborador:
                autenticado = True
                break
             else:
@@ -56,9 +102,10 @@ while True:
                 print("-----------------------------------------")
         if not autenticado:
             print("\n[Acesso negado] Limite de senhas excedido!")
+            continue
 
         autenticado_mfa = False
-        tentativas = 1
+        tentativas = 2
 
         while tentativas > 0:
             codigo_mfa = random.randint(1000, 9999)
