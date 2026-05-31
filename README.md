@@ -38,3 +38,12 @@ Quando o sistema é reiniciado, ele verifica a existência do arquivo utilizando
   * 'json': Para serialização e persistência dos dados.
   * 'random': Para geração de Tokens de segurança (MFA e Exclusão).
   * 'os': Para verificação e manipulação de caminhos de arquivos.
+
+---
+
+**Futuras implementações**
+O projeto está em constante evolução. Os próximos passos planejados para o desenvolvimento são: 
+
+- [] Múltiplos Colaboradores: Evoluir o sistema de autenticação simples para um gerenciamento de usuários por dicionário, permitindo múltiplos logins de mesários.
+- [] Interface Web (Front-end): Separar a lógica de negócios (Back-end) para conectar a urna a uma interface gráfica de site, tornando a experiência do votante mais visual e parecida com a urna real.
+- [] Criptografia de Senhas: Implementar hash de segurança para que as senhas dos colaboradores não fiquem salvas em texto limpo dentro do arquivo JSON.
